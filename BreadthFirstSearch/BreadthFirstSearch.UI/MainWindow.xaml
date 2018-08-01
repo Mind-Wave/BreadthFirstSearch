@@ -5,8 +5,31 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BreadthFirstSearch"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="BreadthFirstSearch" Height="450" Width="800">
     <Grid>
         
+        <Grid.RowDefinitions>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+            <RowDefinition/>
+        </Grid.RowDefinitions>
+        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <Label Grid.Column="0" Grid.Row="0" Content="Input the URL:" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        <Label Grid.Column="0" Grid.Row="1" Content="Please set the depth:" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        <Label Grid.Column="0" Grid.Row="2" Content="Please set the number of threads:" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+
+        <Button Grid.ColumnSpan="2" Grid.Row = "3" Width="128" Height="50" Background="AliceBlue">
+            Go
+        </Button>
+
+        <TextBlock x:Name="tbURL" Grid.Column="1" Grid.Row="0"/>
+        <TextBlock x:Name="tbDepth" Grid.Column="1" Grid.Row="1"/>
+        <TextBlock x:Name="tbThread" Grid.Column="1" Grid.Row="2"/>
     </Grid>
 </Window>
