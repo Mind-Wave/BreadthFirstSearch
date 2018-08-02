@@ -5,10 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:BreadthFirstSearch"
         mc:Ignorable="d"
-        Title="BreadthFirstSearch" Height="450" Width="800">
+        Title="BreadthFirstSearch" Height="310" Width="620" Background="LightBlue">
     <Grid>
         
         <Grid.RowDefinitions>
+            <RowDefinition/>
             <RowDefinition/>
             <RowDefinition/>
             <RowDefinition/>
@@ -20,16 +21,19 @@
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
 
-        <Label Grid.Column="0" Grid.Row="0" Content="Input the URL:" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-        <Label Grid.Column="0" Grid.Row="1" Content="Please set the depth:" VerticalAlignment="Center" HorizontalAlignment="Center"/>
-        <Label Grid.Column="0" Grid.Row="2" Content="Please set the number of threads:" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        <Label Grid.Column="0" Grid.Row="0" Content="Input the URL:" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="DarkBlue"/>
+        <Label Grid.Column="0" Grid.Row="1" Content="Input the string to search:" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="DarkBlue"/>
+        <Label Grid.Column="0" Grid.Row="2" Content="Please set the depth:" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="DarkBlue"/>
+        <Label Grid.Column="0" Grid.Row="3" Content="Please set the number of threads:" VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="DarkBlue"/>
 
-        <Button Grid.ColumnSpan="2" Grid.Row = "3" Width="128" Height="50" Background="AliceBlue">
+        <TextBox x:Name="tbURL" Grid.Column="1" Grid.Row="0" Width="128" Height="20" Background="GhostWhite" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        <TextBox x:Name="tbSearchString" Grid.Column="1" Grid.Row="1" Width="128" Height="20" Background="GhostWhite" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        <TextBox x:Name="tbDepth" Grid.Column="1" Grid.Row="2" Width="128" Height="20" Background="GhostWhite" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+        <TextBox x:Name="tbThread" Grid.Column="1" Grid.Row="3" Width="128" Height="20" Background="GhostWhite" VerticalAlignment="Center" HorizontalAlignment="Center"/>
+
+        <Button x:Name = "btnGo" Grid.ColumnSpan="2" Grid.Row = "4" Width="128" Height="50" Background="AliceBlue" Foreground="DarkBlue" VerticalAlignment="Center" HorizontalAlignment="Center">
             Go
         </Button>
-
-        <TextBlock x:Name="tbURL" Grid.Column="1" Grid.Row="0"/>
-        <TextBlock x:Name="tbDepth" Grid.Column="1" Grid.Row="1"/>
-        <TextBlock x:Name="tbThread" Grid.Column="1" Grid.Row="2"/>
+        
     </Grid>
 </Window>
