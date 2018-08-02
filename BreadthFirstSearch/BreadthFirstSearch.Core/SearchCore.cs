@@ -12,7 +12,7 @@ namespace BreadthFirstSearch.Core
     {
         //vera77.com
         private string htmlCode;
-        
+
         public void GetHtmlCode(string url)
         {
             using (WebClient client = new WebClient())
@@ -20,6 +20,7 @@ namespace BreadthFirstSearch.Core
                 client.Encoding = Encoding.UTF8;
                 htmlCode = client.DownloadString(url);
             }
+
         }
 
         public void SearchMatches(string SearchingWord)
@@ -36,6 +37,21 @@ namespace BreadthFirstSearch.Core
             }
             else
                 Console.WriteLine("No matches!");
+        }
+
+        public void SearchLinks(string url)
+        {
+            Regex regex = new Regex(@"https?://[\w\d\-_]+(\.[\w\d\-_]+)+[\w\d\-\.,@?^=%&amp;:/~\+#]*");
+            MatchCollection matches = regex.Matches(htmlCode);
+            if (matches.Count > 0)
+            {
+                foreach (Match match in matches)
+                {
+                    Console.WriteLine(match.Value);
+                }
+            }
+            else
+                Console.WriteLine("No links!");
         }
     }
 }

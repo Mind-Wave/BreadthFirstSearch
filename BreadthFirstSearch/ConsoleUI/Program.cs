@@ -11,7 +11,9 @@ namespace ConsoleUI
     {
         static void Main(string[] args)
         {
-            Console.InputEncoding = Encoding.UTF8;
+            //1251 номер русской локализации
+            //Console.InputEncoding = Encoding.UTF8     не работает
+            Console.InputEncoding = Encoding.GetEncoding(1251);
             Console.OutputEncoding = Encoding.UTF8;
 
             Console.Write("Enter URL: ");
@@ -20,10 +22,12 @@ namespace ConsoleUI
             SearchCore search = new SearchCore();
             search.GetHtmlCode(url);
 
-            Console.Write("Enter word to search: ");
-            string SearchingWord = Console.ReadLine();
+            //Console.Write("Enter word to search: ");
+            //string SearchingWord = Console.ReadLine();
 
-            search.SearchMatches(SearchingWord);
+            //search.SearchMatches(SearchingWord);
+
+            search.SearchLinks(url);
         }
     }
 }
