@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BreadthFirstSearch.Core;
 
@@ -11,9 +12,8 @@ namespace ConsoleUI
     {
         static void Main(string[] args)
         {
-            //1251 номер русской локализации
             //Console.InputEncoding = Encoding.UTF8     не работает
-            Console.InputEncoding = Encoding.GetEncoding(1251);
+            Console.InputEncoding = Encoding.Unicode;
             Console.OutputEncoding = Encoding.UTF8;
 
             Console.Write("Enter URL: ");
@@ -22,12 +22,15 @@ namespace ConsoleUI
             SearchCore search = new SearchCore();
             search.GetHtmlCode(url);
 
-            //Console.Write("Enter word to search: ");
-            //string SearchingWord = Console.ReadLine();
+            //foreach (Match match in search.SearchMatches("Бог"))
+            //{
+            //    Console.WriteLine(match.Value);
+            //}
 
-            //search.SearchMatches(SearchingWord);
-
-            search.SearchLinks(url);
+            foreach (Match match in search.SearchLinks(url))
+            {
+                Console.WriteLine(match.Value);
+            }
         }
     }
 }

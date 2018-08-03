@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -20,38 +21,26 @@ namespace BreadthFirstSearch.Core
                 client.Encoding = Encoding.UTF8;
                 htmlCode = client.DownloadString(url);
             }
-
         }
 
-        public void SearchMatches(string SearchingWord)
+        public IEnumerable SearchMatches(string SearchingWord)
         {
             Regex regex = new Regex(SearchingWord);
             MatchCollection matches = regex.Matches(htmlCode);
             if (matches.Count > 0)
-            {
-                foreach (Match match in matches)
-                {
-                    Console.WriteLine(match.Value);
-                }
-                Console.WriteLine(matches.Count);
-            }
+                return matches;
             else
-                Console.WriteLine("No matches!");
+                return null;
         }
 
-        public void SearchLinks(string url)
+        public IEnumerable SearchLinks(string url)
         {
             Regex regex = new Regex(@"https?://[\w\d\-_]+(\.[\w\d\-_]+)+[\w\d\-\.,@?^=%&amp;:/~\+#]*");
             MatchCollection matches = regex.Matches(htmlCode);
             if (matches.Count > 0)
-            {
-                foreach (Match match in matches)
-                {
-                    Console.WriteLine(match.Value);
-                }
-            }
+                return matches;
             else
-                Console.WriteLine("No links!");
+                return null;
         }
     }
 }
