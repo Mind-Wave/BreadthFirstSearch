@@ -27,9 +27,9 @@ namespace ConsoleUI
             //    Console.WriteLine(match.Value);
             //}
 
-            foreach (Match match in search.SearchLinks(url))
+            foreach (var match in search.SearchLinks(url))
             {
-                Console.WriteLine(match.Value);
+                Console.WriteLine(match);
             }
         }
     }

@@ -42,6 +42,13 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SearchCore.cs" />
+    <Compile Include="ThreadProccessor.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\BreadthFirstSearch.Model\BreadthFirstSearch.Model.csproj">
+      <Project>{5ce88c21-976d-43fa-9f51-5703942d2b52}</Project>
+      <Name>BreadthFirstSearch.Model</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

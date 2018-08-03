@@ -5,7 +5,9 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
+using BreadthFirstSearch.Model;
 
 namespace BreadthFirstSearch.Core
 {
@@ -13,6 +15,10 @@ namespace BreadthFirstSearch.Core
     {
         //vera77.com
         private string htmlCode;
+
+        private Thread mainThread;
+
+        private bool isStop = true;
 
         public void GetHtmlCode(string url)
         {
@@ -23,24 +29,75 @@ namespace BreadthFirstSearch.Core
             }
         }
 
-        public IEnumerable SearchMatches(string SearchingWord)
+        public int SearchMatches(string SearchingString)
         {
-            Regex regex = new Regex(SearchingWord);
+            Regex regex = new Regex(SearchingString);
             MatchCollection matches = regex.Matches(htmlCode);
-            if (matches.Count > 0)
-                return matches;
-            else
-                return null;
+            return matches.Count;
         }
 
-        public IEnumerable SearchLinks(string url)
+        public IList<string> SearchLinks(string url)
         {
             Regex regex = new Regex(@"https?://[\w\d\-_]+(\.[\w\d\-_]+)+[\w\d\-\.,@?^=%&amp;:/~\+#]*");
             MatchCollection matches = regex.Matches(htmlCode);
-            if (matches.Count > 0)
-                return matches;
-            else
-                return null;
+            return (from Match match in matches
+                    select match.Value).ToList();
+        }
+        
+        /// <summary>
+        /// Инициализируем начало поиска
+        /// </summary>
+        /// <param name="query"></param>
+        public void StartSearching(SearchQuery query)
+        {
+            mainThread = new Thread(SearchingProcess) { IsBackground = true };
+            mainThread.Start(query);
+        }
+
+        /// <summary>
+        /// Остановка поиска и сброс достигнутого прогресса
+        /// </summary>
+        public void StopSearching()
+        {
+            if (mainThread != null)
+            {
+                mainThread.Abort();
+                mainThread = null;
+            }
+        }
+        /// <summary>
+        /// Поиск
+        /// </summary>
+        /// <param name="SearchQuery"></param>
+        public void SearchingProcess(object query)
+        {
+            try
+            {
+                List<ThreadProccessor> ThreadsPool = new List<ThreadProccessor>();
+
+                var searchQuery = (SearchQuery)query;
+
+                if (query == null)
+                {
+                    throw new Exception("Error: invalid input parameters!");
+                }
+                isStop = false;
+
+                for (int i = 0; i < searchQuery.ThreadCount; i++)
+                {
+                    ThreadsPool.Add(new ThreadProccessor(Search));
+                }
+
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
+        public void Search(object query)
+        {
+
         }
     }
 }
