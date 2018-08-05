@@ -53,6 +53,10 @@
       <Project>{05c93e51-8a64-4e8d-b239-6e8a1db2cdb4}</Project>
       <Name>BreadthFirstSearch.Core</Name>
     </ProjectReference>
+    <ProjectReference Include="..\BreadthFirstSearch.Model\BreadthFirstSearch.Model.csproj">
+      <Project>{5ce88c21-976d-43fa-9f51-5703942d2b52}</Project>
+      <Name>BreadthFirstSearch.Model</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

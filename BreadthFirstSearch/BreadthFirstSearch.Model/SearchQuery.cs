@@ -24,5 +24,13 @@ namespace BreadthFirstSearch.Model
         /// Количество потоков, заданных пользователем
         /// </summary>
         public int ThreadCount { get; set; }
+
+        public string CurrentUrl { get; set; }
+
+        public List<string> Scanning { get; set; }
+
+        public List<string> ScannedRef { get; set; }
+
+        public List<string> ScanNextRef { get; set; }
     }
 }

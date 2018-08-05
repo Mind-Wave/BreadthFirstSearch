@@ -18,18 +18,23 @@ namespace BreadthFirstSearch.Core
 
         private Thread mainThread;
 
+        private readonly ManualResetEvent pauseResetEvent;
+
         private bool isStop = true;
 
-        public void GetHtmlCode(string url)
+        private object criticalSection = true;
+
+        public string GetHtmlCode(string url)
         {
             using (WebClient client = new WebClient())
             {
                 client.Encoding = Encoding.UTF8;
                 htmlCode = client.DownloadString(url);
             }
+            return htmlCode;
         }
 
-        public int SearchMatches(string SearchingString)
+        public int CountMatches(string SearchingString)
         {
             Regex regex = new Regex(SearchingString);
             MatchCollection matches = regex.Matches(htmlCode);
@@ -66,14 +71,25 @@ namespace BreadthFirstSearch.Core
             }
         }
         /// <summary>
+        /// Приостановить поиск
+        /// </summary>
+        public void Pause() => pauseResetEvent.Reset();
+
+        /// <summary>
+        /// Продолжить поиск
+        /// </summary>
+        public void Resume() => pauseResetEvent.Set();
+
+        /// <summary>
         /// Поиск
         /// </summary>
         /// <param name="SearchQuery"></param>
         public void SearchingProcess(object query)
         {
+            List<ThreadProccessor> threadsPool = null;
             try
             {
-                List<ThreadProccessor> ThreadsPool = new List<ThreadProccessor>();
+                threadsPool = new List<ThreadProccessor>();
 
                 var searchQuery = (SearchQuery)query;
 
@@ -82,22 +98,106 @@ namespace BreadthFirstSearch.Core
                     throw new Exception("Error: invalid input parameters!");
                 }
                 isStop = false;
-
+                
                 for (int i = 0; i < searchQuery.ThreadCount; i++)
                 {
-                    ThreadsPool.Add(new ThreadProccessor(Search));
+                    threadsPool.Add(new ThreadProccessor(Search));
                 }
 
+                while (searchQuery.Scanning.Count > 0 && searchQuery.ScannedRef.Count <= searchQuery.SearchingDeep)
+                {
+                    pauseResetEvent.WaitOne();
+                    searchQuery.Scanning = ScanLevel(searchQuery, threadsPool);
+                }
+            }
+            catch (ThreadAbortException)
+            {
+                
             }
             catch (Exception ex)
             {
                 throw ex;
             }
+            finally
+            {
+                isStop = true;
+
+                if (threadsPool != null)
+                {
+                    foreach (ThreadProccessor thread in threadsPool)
+                    {
+                        thread.Stop();
+                    }
+                }
+                mainThread = null;
+            }
+        }
+
+        private List<string> ScanLevel(object query, List<ThreadProccessor> threadsPool)
+        {
+            var searchQuery = (SearchQuery)query;
+
+            for (int i = 0; i < searchQuery.Scanning.Count; i++)
+            {
+                Tuple<string, List<string>, List<string>, string> tupleScanData =
+                    new Tuple<string, List<string>, List<string>, string>(searchQuery.Scanning[i], searchQuery.ScannedRef, searchQuery.ScanNextRef, searchQuery.SearchingString);
+
+                pauseResetEvent.WaitOne();
+
+                threadsPool[i % threadsPool.Count].Start(tupleScanData);
+            }
+
+            foreach (ThreadProccessor thread in threadsPool)
+            {
+                thread.Join();
+            }
+
+            if (searchQuery.ScanNextRef.Count + searchQuery.ScannedRef.Count > searchQuery.SearchingDeep)
+            {
+                searchQuery.ScanNextRef.RemoveRange(0, searchQuery.ScanNextRef.Count + searchQuery.ScannedRef.Count - searchQuery.SearchingDeep);
+            }
+
+            return searchQuery.ScanNextRef;
         }
 
         public void Search(object query)
         {
+            try
+            {
+                pauseResetEvent.WaitOne();
 
+                var searchQuery = (SearchQuery)query;
+
+                lock (criticalSection)
+                {
+                    searchQuery.ScannedRef.Add(searchQuery.CurrentUrl);
+                }
+
+                string html = GetHtmlCode(searchQuery.RootUrl).ToLower();
+
+                int countMatches = CountMatches(searchQuery.SearchingString.ToLower());
+
+                lock (criticalSection)
+                {
+
+                    //foreach (var match in SearchLinks(searchQuery.RootUrl))
+                    //{
+                    //    Console.WriteLine("Matches: " + countMatches);
+
+                    //    Console.WriteLine(match);
+                    //}
+                    
+                }
+
+                lock (criticalSection)
+                {
+                    searchQuery.ScanNextRef.AddRange(SearchLinks(searchQuery.CurrentUrl));
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
         }
     }
 }
