@@ -109,7 +109,7 @@ namespace BreadthFirstSearch.UI.ViewModels
 #if DEBUG
             Debug.WriteLine("Start!");
 #endif
-            OnResultFound(new SearchResult { URL = _url, Amount = 64});
+            OnResultFound(new SearchResult { CurrentUrl = _url, CountMatches = 64});
         }
 
         private bool CheckURL()
