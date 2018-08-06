@@ -42,13 +42,11 @@
             START
         </Button>
 
-        <DataGrid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" ItemsSource="{Binding SearchResult}" AutoGenerateColumns="False">
+        <DataGrid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="3" ItemsSource="{Binding SearchResult}" AutoGenerateColumns="False" VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Disabled">
             <DataGrid.Columns>
                 <DataGridTextColumn Width="0.4*" Header="Link" Binding="{Binding CurrentUrl}"/>
-                <DataGridTextColumn Width="0.2*"/>
                 <DataGridTextColumn Width="0.4*" Header="Count" Binding="{Binding CountMatches}"/>
             </DataGrid.Columns>
         </DataGrid>
-
     </Grid>
 </Window>

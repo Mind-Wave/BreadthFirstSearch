@@ -1,4 +1,5 @@
-﻿using BreadthFirstSearch.Model;
+﻿using BreadthFirstSearch.Core;
+using BreadthFirstSearch.Model;
 using BreadthFirstSearch.UI.Helpers;
 using System;
 using System.Collections.Generic;
@@ -109,7 +110,15 @@ namespace BreadthFirstSearch.UI.ViewModels
 #if DEBUG
             Debug.WriteLine("Start!");
 #endif
-            OnResultFound(new SearchResult { CurrentUrl = _url, CountMatches = 64});
+            SearchQuery query = new SearchQuery
+            {
+                RootUrl = _url,
+                SearchingString = _searchString,
+                SearchingDeep = _depth,
+                ThreadCount = _threadsNumber
+            };
+            SearchCore search = new SearchCore(OnResultFound);
+            search.StartSearching(query);
         }
 
         private bool CheckURL()
@@ -119,7 +128,20 @@ namespace BreadthFirstSearch.UI.ViewModels
                 && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
             return result;
         }
-
+        private bool CheckDepthValue()
+        {
+            if (_depth > 0 && _depth < ushort.MaxValue)
+                return true;
+            else
+                return false;
+        }
+        private bool CheckThreadValue()
+        {
+            if (_threadsNumber > 0 && _threadsNumber < 1024)
+                return true;
+            else
+                return false;
+        }
         private void PauseProcess()
         {
 #if DEBUG
@@ -127,7 +149,6 @@ namespace BreadthFirstSearch.UI.ViewModels
 #endif
 
         }
-
         private void OnResultFound(SearchResult result)
         {
             Dispatcher.BeginInvoke(new Action(() => 
@@ -135,7 +156,6 @@ namespace BreadthFirstSearch.UI.ViewModels
                 resultList.Add(result);
                 SearchResult.Refresh();
             }));
-          
         }
     }
 }
