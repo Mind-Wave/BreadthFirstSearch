@@ -97,14 +97,14 @@ namespace BreadthFirstSearch.Core
                 while (scan.Count > 0 && scanned.Count <= searchQuery.SearchingDeep)
                 {
                     pauseResetEvent.WaitOne();
-                    searchQuery.ScannedRef = scanned;
+                    searchQuery.Scanned = scanned;
                     searchQuery.Scanning = scan;
-                    searchQuery.ScanNextRef = new List<string>();
+                    searchQuery.ScanningNext = new List<string>();
 
-                    searchQuery.Scanning = ScanLevel(searchQuery, threadsPool);
+                    scan = ScanLevel(searchQuery, threadsPool);
                 }
             }
-            catch (ThreadAbortException tae)
+            catch (ThreadAbortException)
             {
                 //igonring this shit
             }
@@ -123,9 +123,8 @@ namespace BreadthFirstSearch.Core
                         thread.Stop();
                     }
                 }
-                StopSearching();
-                mainThread = null;
 
+                mainThread = null;
             }
         }
 
@@ -136,7 +135,7 @@ namespace BreadthFirstSearch.Core
             for (int i = 0; i < searchQuery.Scanning.Count; i++)
             {
                 Tuple<string, List<string>, List<string>, string> tupleScanData =
-                    new Tuple<string, List<string>, List<string>, string>(searchQuery.Scanning[i], searchQuery.ScannedRef, searchQuery.ScanNextRef, searchQuery.SearchingString);
+                    new Tuple<string, List<string>, List<string>, string>(searchQuery.Scanning[i], searchQuery.Scanned, searchQuery.ScanningNext, searchQuery.SearchingString);
 
                 pauseResetEvent.WaitOne();
 
@@ -148,12 +147,12 @@ namespace BreadthFirstSearch.Core
                 thread.Join();
             }
 
-            if (searchQuery.ScanNextRef.Count + searchQuery.ScannedRef.Count > searchQuery.SearchingDeep)
+            if (searchQuery.ScanningNext.Count + searchQuery.Scanned.Count > searchQuery.SearchingDeep)
             {
-                searchQuery.ScanNextRef.RemoveRange(0, searchQuery.ScanNextRef.Count + searchQuery.ScannedRef.Count - searchQuery.SearchingDeep);
+                searchQuery.ScanningNext.RemoveRange(0, searchQuery.ScanningNext.Count + searchQuery.Scanned.Count - searchQuery.SearchingDeep);
             }
 
-            return searchQuery.ScanNextRef;
+            return searchQuery.ScanningNext;
         }
 
         private void Search(object query)

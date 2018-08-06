@@ -12,7 +12,9 @@ namespace BreadthFirstSearch.Model
         /// Кол-во найденных совпадений
         /// </summary>
         public int CountMatches { get; set; }
-
+        /// <summary>
+        /// URL скнируемый в данный момент
+        /// </summary>
         public string CurrentUrl { get; set; }
     }
 }

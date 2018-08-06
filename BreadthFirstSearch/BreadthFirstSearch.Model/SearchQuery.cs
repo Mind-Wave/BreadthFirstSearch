@@ -24,11 +24,17 @@ namespace BreadthFirstSearch.Model
         /// Количество потоков, заданных пользователем
         /// </summary>
         public int ThreadCount { get; set; }
-
+        /// <summary>
+        /// сканируется в текущий момент
+        /// </summary>
         public List<string> Scanning { get; set; }
-
-        public List<string> ScannedRef { get; set; }
-
-        public List<string> ScanNextRef { get; set; }
+        /// <summary>
+        /// Уже отсканированные ссылки
+        /// </summary>
+        public List<string> Scanned { get; set; }
+        /// <summary>
+        /// Будут отсканированы в будущем
+        /// </summary>
+        public List<string> ScanningNext { get; set; }
     }
 }

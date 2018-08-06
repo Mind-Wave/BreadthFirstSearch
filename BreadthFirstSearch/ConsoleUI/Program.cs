@@ -19,13 +19,14 @@ namespace ConsoleUI
             SearchCore searchCore = new SearchCore(ResultMethod);
             SearchQuery searchQuery = new SearchQuery
             {
-                RootUrl = "http://www.vera77.com",
+                RootUrl = "https://stackoverflow.com/",
                 SearchingDeep = 5,
                 ThreadCount = 5,
-                SearchingString = "Бог"
+                SearchingString = "how"
             };
 
             searchCore.StartSearching(searchQuery);
+            Console.ReadKey();
         }
 
         private static void ResultMethod(SearchResult searchResult)
