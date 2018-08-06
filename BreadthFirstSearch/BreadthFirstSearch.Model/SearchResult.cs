@@ -16,5 +16,9 @@ namespace BreadthFirstSearch.Model
         /// URL скнируемый в данный момент
         /// </summary>
         public string CurrentUrl { get; set; }
+        /// <summary>
+        /// Print error messaging
+        /// </summary>
+        public string ErrorMessage { get; set; }
     }
 }

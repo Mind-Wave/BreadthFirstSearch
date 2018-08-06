@@ -31,7 +31,7 @@ namespace ConsoleUI
 
         private static void ResultMethod(SearchResult searchResult)
         {
-            Console.WriteLine($"URL: {searchResult.CurrentUrl} Found entries: {searchResult.CountMatches}");
+            Console.WriteLine($"URL: {searchResult.CurrentUrl} Found entries: {searchResult.CountMatches} {searchResult.ErrorMessage ?? string.Empty}");
         }
     }
 }

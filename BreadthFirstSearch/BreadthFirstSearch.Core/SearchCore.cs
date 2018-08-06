@@ -110,7 +110,10 @@ namespace BreadthFirstSearch.Core
             }
             catch (Exception ex)
             {
-                throw ex;
+                SearchResult searchResult = new SearchResult
+                {
+                    ErrorMessage = ex.Message
+                };
             }
             finally
             {
