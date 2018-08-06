@@ -103,11 +103,21 @@ namespace BreadthFirstSearch.UI.ViewModels
         private void SendData()
         {
             SearchResult.Refresh();
+            if (!CheckURL())
+                return;
 
 #if DEBUG
             Debug.WriteLine("Start!");
 #endif
-            OnResultFound(new SearchResult { URL="ver77.com", Amount=50});
+            OnResultFound(new SearchResult { URL = _url, Amount = 64});
+        }
+
+        private bool CheckURL()
+        {
+            Uri uriResult;
+            bool result = Uri.TryCreate(_url, UriKind.Absolute, out uriResult)
+                && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps);
+            return result;
         }
 
         private void PauseProcess()
