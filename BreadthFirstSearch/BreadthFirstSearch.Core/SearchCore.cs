@@ -25,6 +25,8 @@ namespace BreadthFirstSearch.Core
 
         private Action<SearchResult> receiveCallbackAction;
 
+        public event Action Finish;
+
         private SearchCore()
         {
             pauseResetEvent = new ManualResetEvent(true);
@@ -126,7 +128,7 @@ namespace BreadthFirstSearch.Core
                         thread.Stop();
                     }
                 }
-
+                FinishScan();
                 mainThread = null;
             }
         }
@@ -157,7 +159,7 @@ namespace BreadthFirstSearch.Core
 
             return searchQuery.ScanningNext;
         }
-
+        
         private void Search(object query)
         {
             try
@@ -229,5 +231,9 @@ namespace BreadthFirstSearch.Core
                     select match.Value).ToList();
         }
 
+        protected virtual void FinishScan()
+        {
+            Finish?.Invoke();
+        }
     }
 }

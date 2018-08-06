@@ -17,6 +17,7 @@ namespace ConsoleUI
             Console.OutputEncoding = Encoding.UTF8;
 
             SearchCore searchCore = new SearchCore(ResultMethod);
+            searchCore.Finish += FinishScan;
             SearchQuery searchQuery = new SearchQuery
             {
                 RootUrl = "https://stackoverflow.com/",
@@ -28,10 +29,14 @@ namespace ConsoleUI
             searchCore.StartSearching(searchQuery);
             Console.ReadKey();
         }
-
+        
         private static void ResultMethod(SearchResult searchResult)
         {
             Console.WriteLine($"URL: {searchResult.CurrentUrl} Found entries: {searchResult.CountMatches} {searchResult.ErrorMessage ?? string.Empty}");
+        }
+        private static void FinishScan()
+        {
+            Console.WriteLine("Scanning has been finished. Press any key...");
         }
     }
 }
