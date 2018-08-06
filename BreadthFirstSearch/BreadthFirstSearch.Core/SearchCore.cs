@@ -6,14 +6,13 @@ using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading.Tasks;
+using System.Threading.Tasks; 
 using BreadthFirstSearch.Model;
 
 namespace BreadthFirstSearch.Core
 {
     public class SearchCore
     {
-        //vera77.com
         private string htmlCode;
 
         private Thread mainThread;
@@ -24,38 +23,25 @@ namespace BreadthFirstSearch.Core
 
         private object criticalSection = true;
 
-        public string GetHtmlCode(string url)
+        private Action<SearchResult> receiveCallbackAction;
+
+        private SearchCore()
         {
-            using (WebClient client = new WebClient())
-            {
-                client.Encoding = Encoding.UTF8;
-                htmlCode = client.DownloadString(url);
-            }
-            return htmlCode;
+            pauseResetEvent = new ManualResetEvent(true);
         }
 
-        public int CountMatches(string SearchingString)
+        public SearchCore(Action<SearchResult> callback) : this()
         {
-            Regex regex = new Regex(SearchingString);
-            MatchCollection matches = regex.Matches(htmlCode);
-            return matches.Count;
+            receiveCallbackAction = callback;
         }
 
-        public IList<string> SearchLinks(string url)
-        {
-            Regex regex = new Regex(@"https?://[\w\d\-_]+(\.[\w\d\-_]+)+[\w\d\-\.,@?^=%&amp;:/~\+#]*");
-            MatchCollection matches = regex.Matches(htmlCode);
-            return (from Match match in matches
-                    select match.Value).ToList();
-        }
-        
         /// <summary>
         /// Инициализируем начало поиска
         /// </summary>
         /// <param name="query"></param>
         public void StartSearching(SearchQuery query)
         {
-            mainThread = new Thread(SearchingProcess) { IsBackground = true };
+            mainThread = new Thread(SearchingProcess) { IsBackground = false };
             mainThread.Start(query);
         }
 
@@ -84,7 +70,7 @@ namespace BreadthFirstSearch.Core
         /// Поиск
         /// </summary>
         /// <param name="SearchQuery"></param>
-        public void SearchingProcess(object query)
+        private void SearchingProcess(object query)
         {
             List<ThreadProccessor> threadsPool = null;
             try
@@ -98,21 +84,29 @@ namespace BreadthFirstSearch.Core
                     throw new Exception("Error: invalid input parameters!");
                 }
                 isStop = false;
-                
+
                 for (int i = 0; i < searchQuery.ThreadCount; i++)
                 {
                     threadsPool.Add(new ThreadProccessor(Search));
                 }
 
-                while (searchQuery.Scanning.Count > 0 && searchQuery.ScannedRef.Count <= searchQuery.SearchingDeep)
+
+                List<string> scanned = new List<string>();
+                List<string> scan = new List<string> { searchQuery.RootUrl };
+
+                while (scan.Count > 0 && scanned.Count <= searchQuery.SearchingDeep)
                 {
                     pauseResetEvent.WaitOne();
+                    searchQuery.ScannedRef = scanned;
+                    searchQuery.Scanning = scan;
+                    searchQuery.ScanNextRef = new List<string>();
+
                     searchQuery.Scanning = ScanLevel(searchQuery, threadsPool);
                 }
             }
-            catch (ThreadAbortException)
+            catch (ThreadAbortException tae)
             {
-                
+                //igonring this shit
             }
             catch (Exception ex)
             {
@@ -129,7 +123,9 @@ namespace BreadthFirstSearch.Core
                         thread.Stop();
                     }
                 }
+                StopSearching();
                 mainThread = null;
+
             }
         }
 
@@ -160,38 +156,44 @@ namespace BreadthFirstSearch.Core
             return searchQuery.ScanNextRef;
         }
 
-        public void Search(object query)
+        private void Search(object query)
         {
             try
             {
                 pauseResetEvent.WaitOne();
 
-                var searchQuery = (SearchQuery)query;
+                var searchQuery = query as Tuple<string, List<string>, List<string>, string>;
+
+                string currentUrl = searchQuery.Item1;
+                List<string> scannedRef = searchQuery.Item2;
+                List<string> scanNext = searchQuery.Item3;
+                string searchString = searchQuery.Item4;
+
+                string html = GetHtmlCode(currentUrl).ToLower();
+
+                int countMatches = CountMatches(searchString.ToLower());
+
+                SearchResult searchResult = new SearchResult
+                {
+                    CurrentUrl = currentUrl,
+                    CountMatches = countMatches
+                };
 
                 lock (criticalSection)
                 {
-                    searchQuery.ScannedRef.Add(searchQuery.CurrentUrl);
+                    scannedRef.Add(currentUrl);
                 }
 
-                string html = GetHtmlCode(searchQuery.RootUrl).ToLower();
-
-                int countMatches = CountMatches(searchQuery.SearchingString.ToLower());
-
                 lock (criticalSection)
                 {
-
-                    //foreach (var match in SearchLinks(searchQuery.RootUrl))
-                    //{
-                    //    Console.WriteLine("Matches: " + countMatches);
-
-                    //    Console.WriteLine(match);
-                    //}
-                    
+                    receiveCallbackAction(searchResult);
                 }
 
                 lock (criticalSection)
                 {
-                    searchQuery.ScanNextRef.AddRange(SearchLinks(searchQuery.CurrentUrl));
+                    scanNext.AddRange(from string match in SearchLinks(currentUrl)
+                                      where !scannedRef.Contains(match)
+                                      select match);
                 }
             }
             catch (Exception ex)
@@ -199,5 +201,31 @@ namespace BreadthFirstSearch.Core
                 throw ex;
             }
         }
+
+        private string GetHtmlCode(string url)
+        {
+            using (WebClient client = new WebClient())
+            {
+                client.Encoding = Encoding.UTF8;
+                htmlCode = client.DownloadString(url);
+            }
+            return htmlCode;
+        }
+
+        private int CountMatches(string SearchingString)
+        {
+            Regex regex = new Regex(SearchingString);
+            MatchCollection matches = regex.Matches(htmlCode);
+            return matches.Count;
+        }
+
+        private IList<string> SearchLinks(string url)
+        {
+            Regex regex = new Regex(@"https?://[\w\d\-_]+(\.[\w\d\-_]+)+[\w\d\-\.,@?^=%&amp;:/~\+#]*");
+            MatchCollection matches = regex.Matches(htmlCode);
+            return (from Match match in matches
+                    select match.Value).ToList();
+        }
+
     }
 }

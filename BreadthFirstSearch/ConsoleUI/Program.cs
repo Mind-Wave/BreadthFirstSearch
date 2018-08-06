@@ -16,25 +16,21 @@ namespace ConsoleUI
             Console.InputEncoding = Encoding.Unicode;
             Console.OutputEncoding = Encoding.UTF8;
 
-            //Console.Write("Enter URL: ");
-            //string url = Console.ReadLine();
-
-            SearchCore searchCore = new SearchCore();
-            SearchQuery searchQuery = new SearchQuery();
-
-            searchQuery.RootUrl = "https://www.wikipedia.org/";
-            searchQuery.SearchingDeep = 50;
-            searchQuery.ThreadCount = 20;
-            searchQuery.SearchingString = "Articles";
+            SearchCore searchCore = new SearchCore(ResultMethod);
+            SearchQuery searchQuery = new SearchQuery
+            {
+                RootUrl = "http://www.vera77.com",
+                SearchingDeep = 5,
+                ThreadCount = 5,
+                SearchingString = "Бог"
+            };
 
             searchCore.StartSearching(searchQuery);
-            //searchCore.GetHtmlCode(searchQuery.RootUrl);
-            //foreach (var match in searchCore.SearchLinks(searchQuery.RootUrl))
-            //{
-            //    Console.WriteLine(match);
-            //}
-            //searchCore.SearchLinks("https://www.wikipedia.org/");
+        }
 
+        private static void ResultMethod(SearchResult searchResult)
+        {
+            Console.WriteLine($"URL: {searchResult.CurrentUrl} Found entries: {searchResult.CountMatches}");
         }
     }
 }

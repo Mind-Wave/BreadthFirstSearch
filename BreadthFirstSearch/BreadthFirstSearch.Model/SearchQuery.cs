@@ -25,8 +25,6 @@ namespace BreadthFirstSearch.Model
         /// </summary>
         public int ThreadCount { get; set; }
 
-        public string CurrentUrl { get; set; }
-
         public List<string> Scanning { get; set; }
 
         public List<string> ScannedRef { get; set; }
